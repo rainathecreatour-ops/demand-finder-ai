@@ -33,16 +33,16 @@ function DemandFinderAI() {
     }
   };
 
-  const handleStartResearch = async () => {
-    if (!nicheData.niche || !nicheData.buyer || !nicheData.platform || !nicheData.productType) {
-      alert('Please fill in all fields to begin research');
-      return;
-    }
+ const handleStartResearch = async () => {
+  if (!nicheData.niche || !nicheData.buyer || !nicheData.platform || !nicheData.productType) {
+    alert('Please fill in all fields to begin research');
+    return;
+  }
 
-    setLoading(true);
-    setStep('research');
-    
-    const initialPrompt = `You are Demand Finder AI. Analyze this niche:
+  setLoading(true);
+  setStep('research');
+  
+  const initialPrompt = `You are Demand Finder AI. Analyze this niche:
 
 Niche: ${nicheData.niche}
 Buyer: ${nicheData.buyer}
@@ -51,21 +51,65 @@ Product Type: ${nicheData.productType}
 
 Provide: A) Summary B) Sub-niches C) Problems D) Solutions E) Recommendation F) Marketing G) Next Steps`;
 
-    try {
-      const response = await fetch('/.netlify/functions/claude', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          max_tokens: 4000,
-          messages: [{ role: 'user', content: initialPrompt }],
-        }),
-      });
+  try {
+    const response = await fetch('/.netlify/functions/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        max_tokens: 4000,
+        messages: [{ role: 'user', content: initialPrompt }],
+      }),
+    });
 
-      const data = await response.json();
+    const data = await response.json();
+    
+    // DEBUG: Let's see what we actually got
+    console.log('API Response:', data);
 
-if (data.error) {
-  alert('API Error: ' + data.error.message);
+    // Check for errors
+    if (data.error) {
+      alert('API Error: ' + JSON.stringify(data.error));
+      setLoading(false);
+      return;
+    }
+
+    // Check if content exists
+    if (!data.content) {
+      alert('No content in response: ' + JSON.stringify(data));
+      setLoading(false);
+      return;
+    }
+
+    // Check if content is an array
+    if (!Array.isArray(data.content)) {
+      alert('Content is not an array: ' + JSON.stringify(data.content));
+      setLoading(false);
+      return;
+    }
+
+    const aiResponse = data.content
+      .filter(item => item.type === 'text')
+      .map(item => item.text)
+      .join('\n');
+
+    if (!aiResponse) {
+      alert('No text found in response');
+      setLoading(false);
+      return;
+    }
+
+    setChatHistory([
+      { role: 'user', content: `Analyzing: ${nicheData.niche}` },
+      { role: 'assistant', content: aiResponse },
+      { role: 'assistant', content: '\n✅ RESEARCH COMPLETE! Pick a niche/problem to build.' }
+    ]);
+  } catch (error) {
+    console.error('Full error:', error);
+    alert('Error: ' + error.message);
+  }
+  
   setLoading(false);
+};
   return;
 }
 
