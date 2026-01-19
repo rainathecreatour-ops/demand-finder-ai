@@ -42,21 +42,20 @@ function DemandFinderAI() {
     setLoading(true);
     setStep('research');
     
-    const initialPrompt = `You are Demand Finder AI. Analyze this niche:
-
+    const initialPrompt = `Analyze this niche briefly:
 Niche: ${nicheData.niche}
 Buyer: ${nicheData.buyer}
 Platform: ${nicheData.platform}
-Product Type: ${nicheData.productType}
+Type: ${nicheData.productType}
 
-Provide: A) Summary B) Sub-niches C) Problems D) Solutions E) Recommendation F) Marketing G) Next Steps`;
+Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. Keep it brief.`;
 
     try {
       const response = await fetch('/.netlify/functions/claude', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          max_tokens: 4000,
+          max_tokens: 2000,
           messages: [{ role: 'user', content: initialPrompt }],
         }),
       });
@@ -97,7 +96,7 @@ Provide: A) Summary B) Sub-niches C) Problems D) Solutions E) Recommendation F) 
       setChatHistory([
         { role: 'user', content: `Analyzing: ${nicheData.niche}` },
         { role: 'assistant', content: aiResponse },
-        { role: 'assistant', content: '\n✅ RESEARCH COMPLETE! Pick a niche/problem to build.' }
+        { role: 'assistant', content: '\n✅ RESEARCH COMPLETE! Ask me anything or use the buttons below for more details.' }
       ]);
     } catch (error) {
       console.error('Full error:', error);
@@ -115,32 +114,13 @@ Provide: A) Summary B) Sub-niches C) Problems D) Solutions E) Recommendation F) 
     setCurrentMessage('');
     setLoading(true);
 
-    const buildKeywords = ['build', 'start with', 'work on', 'create', 'launch'];
-    const wantsToBuild = buildKeywords.some(k => currentMessage.toLowerCase().includes(k));
-
     try {
-      let prompt = currentMessage;
-      
-      if (wantsToBuild && !buildMode) {
-        setBuildMode(true);
-        prompt = `The user wants to build this: ${currentMessage}
-
-Create a brief business blueprint with:
-1. Product to create (3-5 bullet points)
-2. Pricing strategy (1-2 tiers)
-3. First 2 weeks action plan
-4. Top 3 marketing channels
-5. How to get first 5 customers
-
-Keep it concise and actionable.`;
-      }
-
       const response = await fetch('/.netlify/functions/claude', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          max_tokens: 4000,
-          messages: [...newHistory.slice(0, -1), { role: 'user', content: prompt }],
+          max_tokens: 2000,
+          messages: [...newHistory.slice(0, -1), { role: 'user', content: currentMessage }],
         }),
       });
 
@@ -281,9 +261,9 @@ Keep it concise and actionable.`;
               </div>
               <div>
                 <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-orange-500" />Step 3: Build It
+                  <Zap className="w-5 h-5 text-orange-500" />Step 3: Ask Follow-ups
                 </h3>
-                <p className="text-gray-600">Pick an opportunity and get a complete business blueprint.</p>
+                <p className="text-gray-600">Use the quick buttons or ask custom questions to dig deeper.</p>
               </div>
             </div>
             <div className="p-6 bg-gray-50 border-t">
@@ -471,28 +451,28 @@ Keep it concise and actionable.`;
                     </button>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <button onClick={() => setCurrentMessage("I want to build the top opportunity")} className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg text-sm hover:from-green-700 hover:to-emerald-700 font-semibold">
+                    <button onClick={() => setCurrentMessage("Give me a quick business plan: product, price, first week, where to sell")} className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg text-sm hover:from-green-700 hover:to-emerald-700 font-semibold">
                       🚀 Build This
                     </button>
-                    <button onClick={() => setCurrentMessage("Go deeper on the top sub-niche")} className="px-3 py-1.5 bg-white border text-gray-700 rounded-lg text-sm hover:bg-gray-50">
+                    <button onClick={() => setCurrentMessage("Go deeper with 5 more problems")} className="px-3 py-1.5 bg-white border text-gray-700 rounded-lg text-sm hover:bg-gray-50">
                       🔍 Go Deeper
                     </button>
-                    <button onClick={() => setCurrentMessage("Create AI tool outline")} className="px-3 py-1.5 bg-white border border-purple-300 text-purple-700 rounded-lg text-sm hover:bg-purple-50">
+                    <button onClick={() => setCurrentMessage("AI tool outline: features and tech")} className="px-3 py-1.5 bg-white border border-purple-300 text-purple-700 rounded-lg text-sm hover:bg-purple-50">
                       🤖 AI Tool
                     </button>
-                    <button onClick={() => setCurrentMessage("Suggest automation workflows")} className="px-3 py-1.5 bg-white border border-blue-300 text-blue-700 rounded-lg text-sm hover:bg-blue-50">
+                    <button onClick={() => setCurrentMessage("3 automation workflows")} className="px-3 py-1.5 bg-white border border-blue-300 text-blue-700 rounded-lg text-sm hover:bg-blue-50">
                       ⚡ Automation
                     </button>
-                    <button onClick={() => setCurrentMessage("What tech stack do I need?")} className="px-3 py-1.5 bg-white border border-indigo-300 text-indigo-700 rounded-lg text-sm hover:bg-indigo-50">
+                    <button onClick={() => setCurrentMessage("Tech stack needed")} className="px-3 py-1.5 bg-white border border-indigo-300 text-indigo-700 rounded-lg text-sm hover:bg-indigo-50">
                       🛠️ Tech Stack
                     </button>
-                    <button onClick={() => setCurrentMessage("Write listing copy")} className="px-3 py-1.5 bg-white border border-green-300 text-green-700 rounded-lg text-sm hover:bg-green-50">
+                    <button onClick={() => setCurrentMessage("Write product listing title and short description")} className="px-3 py-1.5 bg-white border border-green-300 text-green-700 rounded-lg text-sm hover:bg-green-50">
                       ✍️ Listing
                     </button>
-                    <button onClick={() => setCurrentMessage("Create 30-day launch plan")} className="px-3 py-1.5 bg-white border border-orange-300 text-orange-700 rounded-lg text-sm hover:bg-orange-50">
+                    <button onClick={() => setCurrentMessage("Week 1 and week 2 action plan")} className="px-3 py-1.5 bg-white border border-orange-300 text-orange-700 rounded-lg text-sm hover:bg-orange-50">
                       📅 Launch
                     </button>
-                    <button onClick={() => setCurrentMessage("Give me marketing strategies")} className="px-3 py-1.5 bg-white border border-pink-300 text-pink-700 rounded-lg text-sm hover:bg-pink-50">
+                    <button onClick={() => setCurrentMessage("Top 3 marketing channels")} className="px-3 py-1.5 bg-white border border-pink-300 text-pink-700 rounded-lg text-sm hover:bg-pink-50">
                       📢 Marketing
                     </button>
                   </div>
