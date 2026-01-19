@@ -147,9 +147,18 @@ const aiResponse = data.content.filter(item => item.type === 'text').map(item =>
     try {
       let prompt = currentMessage;
       if (wantsToBuild && !buildMode) {
-        setBuildMode(true);
-        prompt = `Create COMPLETE BUSINESS BLUEPRINT: Product Plan, Business Structure, 30-Day Launch, Marketing, Customer Acquisition, Scaling, Tools, Checklist. User selected: ${currentMessage}`;
-      }
+  setBuildMode(true);
+  prompt = `The user wants to build this: ${currentMessage}
+
+Create a brief business blueprint with:
+1. Product to create (3-5 bullet points)
+2. Pricing strategy (1-2 tiers)
+3. First 2 weeks action plan
+4. Top 3 marketing channels
+5. How to get first 5 customers
+
+Keep it concise and actionable.`;
+}
 
       const response = await fetch('/.netlify/functions/claude', {
         method: 'POST',
