@@ -62,7 +62,20 @@ Provide: A) Summary B) Sub-niches C) Problems D) Solutions E) Recommendation F) 
       });
 
       const data = await response.json();
-      const aiResponse = data.content.filter(item => item.type === 'text').map(item => item.text).join('\n');
+
+if (data.error) {
+  alert('API Error: ' + data.error.message);
+  setLoading(false);
+  return;
+}
+
+if (!data.content || !Array.isArray(data.content)) {
+  alert('Unexpected response format. Please try again.');
+  setLoading(false);
+  return;
+}
+
+const aiResponse = data.content.filter(item => item.type === 'text').map(item => item.text).join('\n');
 
       setChatHistory([
         { role: 'user', content: `Analyzing: ${nicheData.niche}` },
@@ -103,8 +116,21 @@ Provide: A) Summary B) Sub-niches C) Problems D) Solutions E) Recommendation F) 
         }),
       });
 
-      const data = await response.json();
-      const aiResponse = data.content.filter(item => item.type === 'text').map(item => item.text).join('\n');
+    const data = await response.json();
+
+if (data.error) {
+  alert('API Error: ' + data.error.message);
+  setLoading(false);
+  return;
+}
+
+if (!data.content || !Array.isArray(data.content)) {
+  alert('Unexpected response format. Please try again.');
+  setLoading(false);
+  return;
+}
+
+const aiResponse = data.content.filter(item => item.type === 'text').map(item => item.text).join('\n');
 
       setChatHistory([...newHistory, { role: 'assistant', content: aiResponse }]);
     } catch (error) {
