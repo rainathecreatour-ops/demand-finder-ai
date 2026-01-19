@@ -2,32 +2,48 @@ import React, { useState } from 'react';
 import { Search, TrendingUp, Package, DollarSign, Target, FileText, ChevronRight, Loader2, Download, Plus, Lightbulb, Zap, BookOpen, HelpCircle } from 'lucide-react';
 
 function DemandFinderAI() {
-  🚀 TURN ANY NICHE INTO PROFITABLE PRODUCTS WITH AI
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
 
-Demand Finder AI uses advanced AI to analyze markets and find real customer problems you can solve for profit.
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
+          <div className="text-center mb-6">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">🔐 Demand Finder AI</h1>
+            <p className="text-gray-600">Enter your access code to continue</p>
+          </div>
+          <input
+            type="password"
+            value={passwordInput}
+            onChange={(e) => setPasswordInput(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter' && passwordInput === 'PREMIUM2024') {
+                setIsAuthenticated(true);
+              } else if (e.key === 'Enter') {
+                alert('Invalid access code!');
+              }
+            }}
+            placeholder="Access code"
+            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg mb-4 focus:border-indigo-500 focus:outline-none text-lg"
+          />
+          <button
+            onClick={() => {
+              if (passwordInput === 'PREMIUM2024') {
+                setIsAuthenticated(true);
+              } else {
+                alert('Invalid access code!');
+              }
+            }}
+            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition text-lg"
+          >
+            Access App →
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-✅ WHAT YOU GET:
-- AI-powered niche analyzer
-- Real customer pain points (with urgency scores)
-- Digital, physical, AI & automation product ideas
-- Complete business blueprints
-- 30-day launch plans
-- SEO keywords & marketing strategies
-
-💡 PERFECT FOR:
-- Entrepreneurs looking for their next product idea
-- E-commerce sellers (Etsy, Amazon, Shopify)
-- Digital product creators
-- Anyone wanting validated ideas before investing
-
-⚡ HOW IT WORKS:
-1. Enter your niche
-2. AI finds real problems people will pay to solve
-3. Get ranked product ideas
-4. Receive a complete business blueprint
-5. Launch with confidence!
-
-🔒 INSTANT ACCESS - Get your link and password immediately
   const [step, setStep] = useState('intake');
   const [loading, setLoading] = useState(false);
   const [nicheData, setNicheData] = useState({
@@ -91,13 +107,12 @@ Offer 3 clear next actions.
 Keep everything simple, clear, and actionable.`;
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/.netlify/functions/claude', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
           max_tokens: 4000,
           messages: [
             { role: 'user', content: initialPrompt }
@@ -146,13 +161,12 @@ Keep everything simple, clear, and actionable.`;
         prompt = `Create a COMPLETE BUSINESS BLUEPRINT with: Product Creation Plan, Business Structure, 30-Day Launch Strategy, Marketing Roadmap, Customer Acquisition, Scaling Plan, Tools & Resources, and Weekly Checklist. User selected: ${currentMessage}`;
       }
 
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/.netlify/functions/claude', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
           max_tokens: 4000,
           messages: [...newHistory.slice(0, -1), { role: 'user', content: prompt }],
         }),
