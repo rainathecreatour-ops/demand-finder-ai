@@ -106,11 +106,10 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
     setLoading(false);
   };
 
-  const handleSendMessage = async (messageToSend = null) => {
-    const message = messageToSend || currentMessage;
-    if (!message.trim()) return;
+  const handleSendMessage = async () => {
+    if (!currentMessage.trim()) return;
 
-    const newHistory = [...chatHistory, { role: 'user', content: message }];
+    const newHistory = [...chatHistory, { role: 'user', content: currentMessage }];
     setChatHistory(newHistory);
     setCurrentMessage('');
     setLoading(true);
@@ -121,7 +120,7 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           max_tokens: 2000,
-          messages: [...newHistory.slice(0, -1), { role: 'user', content: message }],
+          messages: [...newHistory.slice(0, -1), { role: 'user', content: currentMessage }],
         }),
       });
 
@@ -447,33 +446,33 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
                       className="flex-1 px-4 py-3 border rounded-lg"
                       disabled={loading}
                     />
-                    <button onClick={() => handleSendMessage()} disabled={loading} className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 font-semibold">
+                    <button onClick={handleSendMessage} disabled={loading} className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 font-semibold">
                       Send
                     </button>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <button onClick={() => handleSendMessage("Quick plan: product, price, week 1, where to sell")} disabled={loading} className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg text-sm hover:from-green-700 hover:to-emerald-700 font-semibold disabled:opacity-50">
+                    <button onClick={() => setCurrentMessage("Quick plan: product, price, week 1, where to sell")} className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg text-sm hover:from-green-700 hover:to-emerald-700 font-semibold">
                       🚀 Build This
                     </button>
-                    <button onClick={() => handleSendMessage("3 more problems")} disabled={loading} className="px-3 py-1.5 bg-white border text-gray-700 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50">
+                    <button onClick={() => setCurrentMessage("3 more problems")} className="px-3 py-1.5 bg-white border text-gray-700 rounded-lg text-sm hover:bg-gray-50">
                       🔍 Go Deeper
                     </button>
-                    <button onClick={() => handleSendMessage("AI tool: features + tech")} disabled={loading} className="px-3 py-1.5 bg-white border border-purple-300 text-purple-700 rounded-lg text-sm hover:bg-purple-50 disabled:opacity-50">
+                    <button onClick={() => setCurrentMessage("AI tool: features + tech")} className="px-3 py-1.5 bg-white border border-purple-300 text-purple-700 rounded-lg text-sm hover:bg-purple-50">
                       🤖 AI Tool
                     </button>
-                    <button onClick={() => handleSendMessage("3 automation ideas")} disabled={loading} className="px-3 py-1.5 bg-white border border-blue-300 text-blue-700 rounded-lg text-sm hover:bg-blue-50 disabled:opacity-50">
+                    <button onClick={() => setCurrentMessage("3 automation ideas")} className="px-3 py-1.5 bg-white border border-blue-300 text-blue-700 rounded-lg text-sm hover:bg-blue-50">
                       ⚡ Automation
                     </button>
-                    <button onClick={() => handleSendMessage("Tech stack")} disabled={loading} className="px-3 py-1.5 bg-white border border-indigo-300 text-indigo-700 rounded-lg text-sm hover:bg-indigo-50 disabled:opacity-50">
+                    <button onClick={() => setCurrentMessage("Tech stack")} className="px-3 py-1.5 bg-white border border-indigo-300 text-indigo-700 rounded-lg text-sm hover:bg-indigo-50">
                       🛠️ Tech
                     </button>
-                    <button onClick={() => handleSendMessage("Product listing: title + description")} disabled={loading} className="px-3 py-1.5 bg-white border border-green-300 text-green-700 rounded-lg text-sm hover:bg-green-50 disabled:opacity-50">
+                    <button onClick={() => setCurrentMessage("Product listing: title + description")} className="px-3 py-1.5 bg-white border border-green-300 text-green-700 rounded-lg text-sm hover:bg-green-50">
                       ✍️ Listing
                     </button>
-                    <button onClick={() => handleSendMessage("Week 1 + 2 plan")} disabled={loading} className="px-3 py-1.5 bg-white border border-orange-300 text-orange-700 rounded-lg text-sm hover:bg-orange-50 disabled:opacity-50">
+                    <button onClick={() => setCurrentMessage("Week 1 + 2 plan")} className="px-3 py-1.5 bg-white border border-orange-300 text-orange-700 rounded-lg text-sm hover:bg-orange-50">
                       📅 Launch
                     </button>
-                    <button onClick={() => handleSendMessage("Top 3 marketing channels")} disabled={loading} className="px-3 py-1.5 bg-white border border-pink-300 text-pink-700 rounded-lg text-sm hover:bg-pink-50 disabled:opacity-50">
+                    <button onClick={() => setCurrentMessage("Top 3 marketing channels")} className="px-3 py-1.5 bg-white border border-pink-300 text-pink-700 rounded-lg text-sm hover:bg-pink-50">
                       📢 Marketing
                     </button>
                   </div>
