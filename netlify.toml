@@ -1,10 +1,12 @@
 [build]
-  functions = "netlify/functions"
+  command = "npm run build"
+  publish = "build"
 
 [functions]
-  timeout = 26
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
 
 [[redirects]]
-  from = "/.netlify/functions/*"
-  to = "/.netlify/functions/:splat"
+  from = "/*"
+  to = "/index.html"
   status = 200
