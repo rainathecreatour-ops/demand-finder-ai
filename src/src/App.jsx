@@ -60,11 +60,22 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
         }),
       });
 
+      // Get response as text first
+      const responseText = await response.text();
+      
       if (!response.ok) {
+        console.error('HTTP error! status:', response.status, 'body:', responseText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      // Try to parse as JSON
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse JSON. Response was:', responseText);
+        throw new Error('Server returned invalid response (not JSON). Please check that the Netlify function is deployed correctly.');
+      }
       
       console.log('API Response:', data);
 
@@ -129,16 +140,34 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
     setLoading(true);
 
     try {
+      // Only send last 10 messages to avoid timeout
+      const messagesToSend = newHistory.slice(-10);
+      
       const response = await fetch('/.netlify/functions/claude', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           max_tokens: 2000,
-          messages: newHistory,
+          messages: messagesToSend,
         }),
       });
 
-      const data = await response.json();
+      // Get response as text first
+      const responseText = await response.text();
+      
+      if (!response.ok) {
+        console.error('HTTP error! status:', response.status, 'body:', responseText);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Try to parse as JSON
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse JSON. Response was:', responseText);
+        throw new Error('Server returned invalid response (not JSON). Please check that the Netlify function is deployed correctly.');
+      }
       
       console.log('Send Message API Response:', data);
 
