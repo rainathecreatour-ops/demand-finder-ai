@@ -51,7 +51,7 @@ Type: ${nicheData.productType}
 Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. Keep it brief.`;
 
     try {
-      const response = await fetch('/.netlify/functions/claude', {
+      const response = await fetch('/api/claude', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -143,7 +143,7 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
       // Only send last 10 messages to avoid timeout
       const messagesToSend = newHistory.slice(-10);
       
-      const response = await fetch('/.netlify/functions/claude', {
+      const response = await fetch('/api/claude', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
