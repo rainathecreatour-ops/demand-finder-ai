@@ -51,10 +51,9 @@ module.exports = async function handler(req, res) {
         apiRes.on('data', (chunk) => body += chunk);
         apiRes.on('end', () => {
           try {
-            const parsedBody = JSON.parse(body);
             resolve({
               statusCode: apiRes.statusCode,
-              body: parsedBody
+              body: JSON.parse(body)
             });
           } catch (e) {
             reject(new Error('Failed to parse response'));
@@ -62,7 +61,7 @@ module.exports = async function handler(req, res) {
         });
       });
 
-      apiReq.on('error', (e) => reject(e));
+      apiReq.on('error', reject);
       apiReq.on('timeout', () => {
         apiReq.destroy();
         reject(new Error('Request timeout'));
@@ -73,19 +72,4 @@ module.exports = async function handler(req, res) {
     });
 
     if (response.statusCode !== 200) {
-      return res.status(response.statusCode).json({
-        error: response.body.error || 'API request failed',
-        errorType: 'APIError'
-      });
-    }
-
-    return res.status(200).json(response.body);
-
-  } catch (error) {
-    console.error('Error:', error);
-    return res.status(500).json({ 
-      error: error.message || 'Internal server error',
-      errorType: 'FunctionError'
-    });
-  }
-};
+      return res.status(response.statusCode).j
