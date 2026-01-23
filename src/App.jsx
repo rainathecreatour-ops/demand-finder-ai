@@ -51,14 +51,14 @@ Type: ${nicheData.productType}
 Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. Keep it brief.`;
 
     try {
-      const response = await fetch('/.netlify/functions/claude', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          max_tokens: 2000,
-          messages: [{ role: 'user', content: initialPrompt }],
-        }),
-      });
+   const response = await fetch('/analyze', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    prompt: initialPrompt,
+  }),
+});
+
 
       // Get response as text first
       const responseText = await response.text();
@@ -143,14 +143,15 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
       // Only send last 10 messages to avoid timeout
       const messagesToSend = newHistory.slice(-10);
       
-      const response = await fetch('/.netlify/functions/claude', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          max_tokens: 2000,
-          messages: messagesToSend,
-        }),
-      });
+     const response = await fetch('/analyze', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    // send full conversation so Claude can continue context
+    messages: messagesToSend,
+  }),
+});
+
 
       // Get response as text first
       const responseText = await response.text();
@@ -160,7 +161,7 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Try to parse as JSON
+       // Try to parse as JSON
       let data;
       try {
         data = JSON.parse(responseText);
