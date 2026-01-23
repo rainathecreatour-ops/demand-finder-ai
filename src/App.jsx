@@ -15,7 +15,7 @@ function App() {
   const [chatHistory, setChatHistory] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [showHelp, setShowHelp] = useState(false);
-  const [buildMode, setBuildMode] = useState(false);
+  
 
   const nicheExamples = [
     "Productivity tools for remote workers",
