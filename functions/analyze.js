@@ -3,31 +3,44 @@ export async function onRequestPost(context) {
     const { request, env } = context;
     const body = await request.json();
 
-    // ✅ Example: calling OpenAI (replace if you’re using Claude)
-    const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+    const apiKey = env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      return new Response(
+        JSON.stringify({ error: "Missing ANTHROPIC_API_KEY in Cloudflare env vars" }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Accept either {prompt} or {messages}
+    const messages =
+      Array.isArray(body.messages) && body.messages.length
+        ? body.messages
+        : [{ role: "user", content: body.prompt || "" }];
+
+    const resp = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${env.OPENAI_API_KEY}`,
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: "You are a helpful market demand research assistant." },
-          { role: "user", content: body.prompt || "" },
-        ],
+        model: "claude-3-5-sonnet-20240620",
+        max_tokens: 1200,
+        messages,
       }),
     });
 
     const data = await resp.json();
+
     return new Response(JSON.stringify(data), {
-      headers: { "Content-Type": "application/json" },
       status: resp.status,
+      headers: { "Content-Type": "application/json" },
     });
   } catch (err) {
     return new Response(JSON.stringify({ error: String(err) }), {
-      headers: { "Content-Type": "application/json" },
       status: 500,
+      headers: { "Content-Type": "application/json" },
     });
   }
 }
