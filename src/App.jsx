@@ -61,14 +61,26 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
 
 
       // Get response as text first
-      const responseText = await response.text();
-      
-      if (!response.ok) {
-        console.error('HTTP error! status:', response.status, 'body:', responseText);
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+     // Get response as text first
+const responseText = await response.text();
 
-      throw new Error('Server returned invalid response (not JSON). Please check that your Cloudflare Pages Function (/functions/analyze.js) is deployed and that ANTHROPIC_API_KEY is set.');
+if (!response.ok) {
+  console.error('HTTP error! status:', response.status, 'body:', responseText);
+  throw new Error(`HTTP error! status: ${response.status}`);
+}
+
+// Parse JSON safely (Cloudflare Function should return JSON)
+let data;
+try {
+  data = JSON.parse(responseText);
+} catch (parseError) {
+  console.error('Failed to parse JSON. Response was:', responseText);
+  throw new Error(
+    'Server returned invalid response (not JSON). Please check that your Cloudflare Pages Function (/functions/analyze.js) is deployed and that ANTHROPIC_API_KEY is set.'
+  );
+}
+
+console.log('API Response:', data);
 
       
       console.log('API Response:', data);
