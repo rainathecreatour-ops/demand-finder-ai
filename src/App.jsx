@@ -66,7 +66,7 @@ const responseText = await response.text();
 
 if (!response.ok) {
   console.error('HTTP error! status:', response.status, 'body:', responseText);
-  throw new Error(`HTTP error! status: ${response.status}`);
+  throw new Error(`HTTP error! status: ${response.status}\n\n${responseText}`);
 }
 
 // Parse JSON safely (Cloudflare Function should return JSON)
