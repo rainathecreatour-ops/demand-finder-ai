@@ -1,13 +1,16 @@
+const FUNCTION_VERSION = "v2-model-latest";
+
 export async function onRequestPost({ request, env }) {
   try {
     const body = await request.json();
 
-    if (!env.ANTHROPIC_API_KEY) {
-      return new Response(
-        JSON.stringify({ error: "ANTHROPIC_API_KEY is missing" }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
-    }
+    if (!env.ANTHROPIC_API_KEY) 
+     data._functionVersion = FUNCTION_VERSION;
+return new Response(JSON.stringify(data), {
+  status: resp.status,
+  headers: { "Content-Type": "application/json" },
+});
+
 
     const messages =
       Array.isArray(body.messages) && body.messages.length
