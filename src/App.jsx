@@ -167,7 +167,19 @@ console.log('API Response:', data);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      throw new Error('Server returned invalid response (not JSON). Please check that your Cloudflare Pages Function (/functions/analyze.js) is deployed and that ANTHROPIC_API_KEY is set.');
+// Parse JSON safely
+let data;
+try {
+  data = JSON.parse(responseText);
+} catch (parseError) {
+  console.error('Failed to parse JSON. Response was:', responseText);
+  throw new Error(
+    'Server returned invalid response (not JSON). Please check that your Cloudflare Pages Function (/functions/analyze.js) is deployed and that ANTHROPIC_API_KEY is set.'
+  );
+}
+
+console.log('Send Message API Response:', data);
+
 
       console.log('Send Message API Response:', data);
 
