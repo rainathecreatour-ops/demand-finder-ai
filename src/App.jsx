@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, TrendingUp, Package, DollarSign, Target, FileText, ChevronRight, Loader2, Download, Plus, Lightbulb, Zap, BookOpen, HelpCircle } from 'lucide-react';
+import { Search, TrendingUp, Package, DollarSign, Target, FileText, Loader2, Download, Plus, Lightbulb, Zap, HelpCircle } from 'lucide-react';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
