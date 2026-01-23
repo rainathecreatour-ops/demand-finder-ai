@@ -1,16 +1,13 @@
-const FUNCTION_VERSION = "v2-model-latest";
-
 export async function onRequestPost({ request, env }) {
   try {
     const body = await request.json();
 
-    if (!env.ANTHROPIC_API_KEY) 
-     data._functionVersion = FUNCTION_VERSION;
-return new Response(JSON.stringify(data), {
-  status: resp.status,
-  headers: { "Content-Type": "application/json" },
-});
-
+    if (!env.ANTHROPIC_API_KEY) {
+      return new Response(
+        JSON.stringify({ error: "Missing ANTHROPIC_API_KEY in Cloudflare env vars" }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
+    }
 
     const messages =
       Array.isArray(body.messages) && body.messages.length
@@ -22,26 +19,28 @@ return new Response(JSON.stringify(data), {
       headers: {
         "Content-Type": "application/json",
         "x-api-key": env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01"
+        "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
         model: "claude-3-5-sonnet-latest",
         max_tokens: 1000,
-        messages
-      })
+        messages,
+      }),
     });
 
-    const data = await resp.json();
+    const data = await resp.json(); // ✅ data is created FIRST
+
+    // ✅ only use data AFTER it exists
+    data._functionVersion = "v3-anthropic-sonnet-latest";
 
     return new Response(JSON.stringify(data), {
       status: resp.status,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
-
   } catch (err) {
-    return new Response(
-      JSON.stringify({ error: String(err) }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: String(err) }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
