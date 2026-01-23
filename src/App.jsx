@@ -68,14 +68,8 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Try to parse as JSON
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error('Failed to parse JSON. Response was:', responseText);
-        throw new Error('Server returned invalid response (not JSON). Please check that the Netlify function is deployed correctly.');
-      }
+      throw new Error('Server returned invalid response (not JSON). Please check that your Cloudflare Pages Function (/functions/analyze.js) is deployed and that ANTHROPIC_API_KEY is set.');
+
       
       console.log('API Response:', data);
 
@@ -161,15 +155,8 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-       // Try to parse as JSON
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error('Failed to parse JSON. Response was:', responseText);
-        throw new Error('Server returned invalid response (not JSON). Please check that the Netlify function is deployed correctly.');
-      }
-      
+      throw new Error('Server returned invalid response (not JSON). Please check that your Cloudflare Pages Function (/functions/analyze.js) is deployed and that ANTHROPIC_API_KEY is set.');
+
       console.log('Send Message API Response:', data);
 
       if (data.error || data.errorType) {
