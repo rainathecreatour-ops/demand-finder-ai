@@ -31,7 +31,7 @@ export async function onRequestPost({ request, env }) {
     const data = await resp.json(); // ✅ data is created FIRST
 
     // ✅ only use data AFTER it exists
-    data._functionVersion = "v3-anthropic-sonnet-latest";
+   data._functionVersion = "v4-anthropic-haiku-20240307";
 
     return new Response(JSON.stringify(data), {
       status: resp.status,
