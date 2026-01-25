@@ -6,16 +6,18 @@ function App() {
   const [licenseKey, setLicenseKey] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [userEmail, setUserEmail] = useState('');
- const productName = "Demand Finder AI";
-');
+const [productName, setProductName] = useState('Demand Finder AI');
+
+
   const [step, setStep] = useState('intake');
   const [loading, setLoading] = useState(false);
-  const [nicheData, setNicheData] = useState({
-    niche: '',
-    buyer: '',
-    platform: '',
-    productType: ''
-  });
+ const [nicheData, setNicheData] = useState({
+  niche: '',
+  buyer: '',
+  platform: '',
+  customPlatform: '',
+  productType: ''
+});
   const [chatHistory, setChatHistory] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [showHelp, setShowHelp] = useState(false);
