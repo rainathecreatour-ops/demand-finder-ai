@@ -273,6 +273,9 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{productName}</h1>
 
 
+
+
+
             <p className="text-gray-600">Enter your license key to get started</p>
           </div>
 
@@ -342,7 +345,8 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
               <TrendingUp className="w-6 h-6 text-white" />
             </div>
             <div>
-             <h1 className="text-2xl font-bold mb-4">
+            <h1 className="text-2xl font-bold">{productName}</h1>
+
   🔐 {productName || "Demand Finder AI"}
 </h1>
               
