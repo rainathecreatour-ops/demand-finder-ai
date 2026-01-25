@@ -268,9 +268,10 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
             <div className="inline-block p-3 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full mb-4">
               <TrendingUp className="w-12 h-12 text-indigo-600" />
             </div>
-           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-  {productName || 'Demand Finder AI'}
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+  {productName}
 </h1>
+
             <p className="text-gray-600">Enter your license key to get started</p>
           </div>
 
