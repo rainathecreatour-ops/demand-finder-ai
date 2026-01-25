@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Search, TrendingUp, Package, DollarSign, Target, FileText, Loader2, Download, Plus, Lightbulb, Zap, HelpCircle } from 'lucide-react';
 
