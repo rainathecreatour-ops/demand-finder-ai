@@ -3,10 +3,10 @@ import { Search, TrendingUp, Package, DollarSign, Target, FileText, Loader2, Dow
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [emailInput, setEmailInput] = useState('');
-  const [emailSent, setEmailSent] = useState(false);
+  const [licenseKey, setLicenseKey] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [userEmail, setUserEmail] = useState('');
+  const [productName, setProductName] = useState('');
   const [step, setStep] = useState('intake');
   const [loading, setLoading] = useState(false);
   const [nicheData, setNicheData] = useState({
@@ -29,8 +29,7 @@ function App() {
 
   // Check for session token on load
   React.useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const sessionToken = urlParams.get('session') || localStorage.getItem('sessionToken');
+    const sessionToken = localStorage.getItem('sessionToken');
     
     if (sessionToken) {
       // Verify session
@@ -42,42 +41,47 @@ function App() {
       .then(res => res.json())
       .then(data => {
         if (data.authenticated) {
-          localStorage.setItem('sessionToken', sessionToken);
           setUserEmail(data.email);
+          setProductName(data.productName || 'Demand Finder AI');
           setIsAuthenticated(true);
-          // Clean URL
-          window.history.replaceState({}, '', '/');
+        } else {
+          // Session invalid, clear it
+          localStorage.removeItem('sessionToken');
         }
       })
       .catch(err => console.error('Session check failed:', err));
     }
   }, []);
 
-  const handleSendMagicLink = async () => {
-    if (!emailInput || !emailInput.includes('@')) {
-      alert('Please enter a valid email address');
+  const handleVerifyLicense = async () => {
+    if (!licenseKey || !licenseKey.trim()) {
+      alert('Please enter your license key');
       return;
     }
 
     setAuthLoading(true);
 
     try {
-      const response = await fetch('/send-magic-link', {
+      const response = await fetch('/verify-license', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: emailInput })
+        body: JSON.stringify({ licenseKey: licenseKey.trim() })
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        setEmailSent(true);
-        alert('Magic link sent! Check your email to sign in.');
+      if (response.ok && data.success) {
+        // Store session token
+        localStorage.setItem('sessionToken', data.sessionToken);
+        setUserEmail(data.email);
+        setProductName(data.productName || 'Demand Finder AI');
+        setIsAuthenticated(true);
+        alert(data.message || 'License verified! Welcome!');
       } else {
-        alert('Error: ' + (data.error || 'Failed to send magic link'));
+        alert(data.error || 'Invalid license key');
       }
     } catch (error) {
-      alert('Error: ' + error.message);
+      alert('Error verifying license: ' + error.message);
     }
 
     setAuthLoading(false);
@@ -87,8 +91,10 @@ function App() {
     localStorage.removeItem('sessionToken');
     setIsAuthenticated(false);
     setUserEmail('');
+    setProductName('');
     setStep('intake');
     setChatHistory([]);
+    setLicenseKey('');
   };
 
   const handleStartResearch = async () => {
@@ -261,62 +267,61 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
               <TrendingUp className="w-12 h-12 text-indigo-600" />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Demand Finder AI</h1>
-            <p className="text-gray-600">
-              {emailSent ? 'Check your email!' : 'Sign in with your email'}
-            </p>
+            <p className="text-gray-600">Enter your license key to get started</p>
           </div>
 
-          {!emailSent ? (
-            <>
-              <input
-                type="email"
-                value={emailInput}
-                onChange={(e) => setEmailInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMagicLink()}
-                placeholder="your@email.com"
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg mb-4 focus:border-indigo-500 focus:outline-none text-lg"
-                disabled={authLoading}
-              />
-              <button 
-                onClick={handleSendMagicLink} 
-                disabled={authLoading}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 text-lg disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {authLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Sending...
-                  </>
-                ) : (
-                  '✨ Send Magic Link'
-                )}
-              </button>
-              <p className="text-xs text-gray-500 text-center mt-4">
-                We'll send you a secure link to access the app
+          <div className="space-y-4">
+            <input
+              type="text"
+              value={licenseKey}
+              onChange={(e) => setLicenseKey(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleVerifyLicense()}
+              placeholder="XXXX-XXXX-XXXX-XXXX"
+              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg mb-2 focus:border-indigo-500 focus:outline-none text-lg font-mono text-center uppercase"
+              disabled={authLoading}
+              maxLength={50}
+            />
+            
+            <button 
+              onClick={handleVerifyLicense} 
+              disabled={authLoading}
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 text-lg disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {authLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Verifying...
+                </>
+              ) : (
+                '🔓 Activate License'
+              )}
+            </button>
+
+            <div className="border-t pt-4">
+              <p className="text-sm text-gray-600 mb-3">
+                💡 <strong>Where's my license key?</strong>
               </p>
-            </>
-          ) : (
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold mb-2">Email Sent!</h3>
-              <p className="text-gray-600 mb-4">
-                Check your inbox for <strong>{emailInput}</strong>
-              </p>
-              <p className="text-sm text-gray-500 mb-4">
-                Click the magic link in the email to sign in. The link expires in 15 minutes.
-              </p>
-              <button 
-                onClick={() => setEmailSent(false)}
-                className="text-indigo-600 hover:text-indigo-700 text-sm font-semibold"
-              >
-                ← Use different email
-              </button>
+              <ul className="text-xs text-gray-500 space-y-1">
+                <li>• Check your Gumroad purchase email</li>
+                <li>• Or login to Gumroad Library</li>
+                <li>• Your license key was sent after purchase</li>
+              </ul>
             </div>
-          )}
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-sm text-blue-800 font-semibold mb-2">
+                🛒 Don't have a license yet?
+              </p>
+              <a 
+                href="https://yourproduct.gumroad.com" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 font-semibold"
+              >
+                Purchase on Gumroad →
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     );
