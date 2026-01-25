@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Search, TrendingUp, Package, DollarSign, Target, FileText, Loader2, Download, Plus, Lightbulb, Zap, HelpCircle } from 'lucide-react';
 
@@ -6,14 +7,13 @@ function App() {
   const [passwordInput, setPasswordInput] = useState('');
   const [step, setStep] = useState('intake');
   const [loading, setLoading] = useState(false);
-const [nicheData, setNicheData] = useState({
+ const [nicheData, setNicheData] = useState({
   niche: '',
   buyer: '',
   platform: '',
   customPlatform: '',
   productType: ''
 });
-
 
   const [chatHistory, setChatHistory] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
@@ -37,14 +37,10 @@ const [nicheData, setNicheData] = useState({
   };
 
   const handleStartResearch = async () => {
-    if (
-  !nicheData.niche ||
-  !nicheData.buyer ||
-  !nicheData.platform ||
-  (nicheData.platform === 'Other' && !nicheData.customPlatform) ||
-  !nicheData.productType
-) {
-
+    if (!nicheData.niche || !nicheData.buyer || !nicheData.platform || !nicheData.productType) {
+      alert('Please fill in all fields to begin research');
+      return;
+    }
 
     setLoading(true);
     setStep('research');
@@ -52,11 +48,7 @@ const [nicheData, setNicheData] = useState({
     const initialPrompt = `Analyze this niche briefly:
 Niche: ${nicheData.niche}
 Buyer: ${nicheData.buyer}
-Platform: ${
-  nicheData.platform === 'Other'
-    ? nicheData.customPlatform
-    : nicheData.platform
-}
+Platform: ${nicheData.platform}
 Type: ${nicheData.productType}
 
 Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. Keep it brief.`;
@@ -383,50 +375,17 @@ console.log('Send Message API Response:', data);
                   />
                 </div>
 
-              <div>
-  <label className="block text-sm font-semibold text-gray-700 mb-2">
-    3. Where to sell?
-  </label>
-
-  <select
-    value={nicheData.platform}
-    onChange={(e) =>
-      setNicheData({
-        ...nicheData,
-        platform: e.target.value,
-        customPlatform: ''
-      })
-    }
-    className="w-full px-4 py-3 border rounded-lg"
-  >
-    <option value="">Select...</option>
-    <option value="Etsy">Etsy</option>
-    <option value="Amazon">Amazon</option>
-    <option value="Shopify">Shopify</option>
-    <option value="Gumroad">Gumroad</option>
-    <option value="Fiverr">Fiverr</option>
-    <option value="Upwork">Upwork</option>
-    <option value="LinkedIn">LinkedIn</option>
-    <option value="Own Website">Own Website</option>
-    <option value="Other">Other</option>
-  </select>
-
-  {nicheData.platform === 'Other' && (
-    <input
-      type="text"
-      value={nicheData.customPlatform}
-      onChange={(e) =>
-        setNicheData({
-          ...nicheData,
-          customPlatform: e.target.value
-        })
-      }
-      placeholder="Enter platform name (e.g. TikTok, Reddit, Facebook Groups)"
-      className="mt-3 w-full px-4 py-3 border rounded-lg"
-    />
-  )}
-</div>
-
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">3. Where to sell?</label>
+                  <select value={nicheData.platform} onChange={(e) => setNicheData({...nicheData, platform: e.target.value})} className="w-full px-4 py-3 border rounded-lg">
+                    <option value="">Select...</option>
+                    <option value="Etsy">Etsy</option>
+                    <option value="Amazon">Amazon</option>
+                    <option value="Shopify">Shopify</option>
+                    <option value="Gumroad">Gumroad</option>
+                    <option value="Own Website">Own Website</option>
+                  </select>
+                </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">4. Product type?</label>
