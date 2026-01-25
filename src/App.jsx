@@ -5,8 +5,13 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
   const [step, setStep] = useState('intake');
-  const [loading, setLoading] = useState(false);
-setNicheData({ niche: '', buyer: '', platform: '', customPlatform: '', productType: '' });
+ const [nicheData, setNicheData] = useState({
+  niche: '',
+  buyer: '',
+  platform: '',
+  customPlatform: '',
+  productType: ''
+});
 
   const [chatHistory, setChatHistory] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
@@ -40,6 +45,88 @@ const handleStartResearch = async () => {
     alert('Please fill in all fields to begin research');
     return;
   }
+
+  setLoading(true);
+  setStep('research');
+
+  const platformValue =
+    nicheData.platform === 'Other' ? nicheData.customPlatform : nicheData.platform;
+
+  const initialPrompt = `Analyze this niche briefly:
+Niche: ${nicheData.niche}
+Buyer: ${nicheData.buyer}
+Platform: ${platformValue}
+Type: ${nicheData.productType}
+
+Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. Keep it brief.`;
+
+  try {
+    const response = await fetch('/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: initialPrompt }),
+    });
+
+    const responseText = await response.text();
+
+    if (!response.ok) {
+      console.error('HTTP error! status:', response.status, 'body:', responseText);
+      throw new Error(`HTTP error! status: ${response.status}\n\n${responseText}`);
+    }
+
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('Failed to parse JSON. Response was:', responseText);
+      throw new Error(
+        'Server returned invalid response (not JSON). Please check that your Cloudflare Pages Function (/functions/analyze.js) is deployed and that ANTHROPIC_API_KEY is set.'
+      );
+    }
+
+    if (data.error || data.errorType) {
+      const errorMsg = data.errorMessage || JSON.stringify(data.error) || 'Unknown error';
+      alert('API Error: ' + errorMsg);
+      setLoading(false);
+      setStep('intake');
+      return;
+    }
+
+    if (!Array.isArray(data.content)) {
+      alert('Invalid response format. Please try again.');
+      console.error('Full response:', data);
+      setLoading(false);
+      setStep('intake');
+      return;
+    }
+
+    const aiResponse = data.content
+      .filter((item) => item.type === 'text')
+      .map((item) => item.text)
+      .join('\n');
+
+    if (!aiResponse) {
+      alert('No text found in response. Please try again.');
+      setLoading(false);
+      setStep('intake');
+      return;
+    }
+
+    setChatHistory([
+      { role: 'user', content: `Analyzing: ${nicheData.niche}` },
+      { role: 'assistant', content: aiResponse },
+      { role: 'assistant', content: '\n✅ RESEARCH COMPLETE! Ask me anything or use the buttons below for more details.' },
+    ]);
+
+    setLoading(false);
+  } catch (error) {
+    console.error('Full error:', error);
+    alert('Error connecting to AI: ' + error.message);
+    setLoading(false);
+    setStep('intake');
+  }
+};
+
 
   setLoading(true);
   setStep('research');
