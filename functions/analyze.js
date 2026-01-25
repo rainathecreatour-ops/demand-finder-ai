@@ -1,46 +1,71 @@
 export async function onRequestPost({ request, env }) {
+  // Check API key exists
+  if (!env.ANTHROPIC_API_KEY) {
+    return new Response(
+      JSON.stringify({ error: "Missing ANTHROPIC_API_KEY" }),
+      { 
+        status: 500, 
+        headers: { 
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*"
+        } 
+      }
+    );
+  }
+
   try {
     const body = await request.json();
-
-    if (!env.ANTHROPIC_API_KEY) {
+    
+    // Handle both single prompt and conversation messages
+    let messages;
+    if (body.prompt) {
+      // Single prompt from initial research
+      messages = [{ role: "user", content: body.prompt }];
+    } else if (body.messages) {
+      // Conversation from follow-up questions
+      messages = body.messages;
+    } else {
       return new Response(
-        JSON.stringify({ error: "Missing ANTHROPIC_API_KEY in Cloudflare env vars" }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
+        JSON.stringify({ error: "Missing prompt or messages" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    const messages =
-      Array.isArray(body.messages) && body.messages.length
-        ? body.messages
-        : [{ role: "user", content: body.prompt || "" }];
-
+    // Call Anthropic API
     const resp = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
         "x-api-key": env.ANTHROPIC_API_KEY,
         "anthropic-version": "2023-06-01",
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-       model: env.ANTHROPIC_MODEL || "claude-3-haiku-20240307",
-        max_tokens: 1000,
-        messages,
-      }),
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 2000,
+        messages: messages
+      })
     });
 
-    const data = await resp.json(); // ✅ data is created FIRST
-
-    // ✅ only use data AFTER it exists
-   data._functionVersion = "v4-anthropic-haiku-20240307";
-
+    const data = await resp.json();
+    
     return new Response(JSON.stringify(data), {
       status: resp.status,
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+      }
     });
-  } catch (err) {
-    return new Response(JSON.stringify({ error: String(err) }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ 
+        error: error.message,
+        errorType: "FunctionError"
+      }),
+      { 
+        status: 500, 
+        headers: { "Content-Type": "application/json" } 
+      }
+    );
   }
 }
