@@ -6,7 +6,8 @@ function App() {
   const [licenseKey, setLicenseKey] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [userEmail, setUserEmail] = useState('');
-  const [productName, setProductName] = useState('');
+ const productName = "Demand Finder AI";
+');
   const [step, setStep] = useState('intake');
   const [loading, setLoading] = useState(false);
   const [nicheData, setNicheData] = useState({
@@ -29,6 +30,7 @@ function App() {
 
   // Check for session token on load
   React.useEffect(() => {
+    setProductName("Demand Finder AI");
     const sessionToken = localStorage.getItem('sessionToken');
     
     if (sessionToken) {
