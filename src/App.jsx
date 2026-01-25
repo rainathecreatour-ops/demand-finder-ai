@@ -6,12 +6,14 @@ function App() {
   const [passwordInput, setPasswordInput] = useState('');
   const [step, setStep] = useState('intake');
   const [loading, setLoading] = useState(false);
-  const [nicheData, setNicheData] = useState({
-    niche: '',
-    buyer: '',
-    platform: '',
-    productType: ''
-  });
+ const [nicheData, setNicheData] = useState({
+  niche: '',
+  buyer: '',
+  platform: '',
+  customPlatform: '',
+  productType: ''
+});
+
   const [chatHistory, setChatHistory] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [showHelp, setShowHelp] = useState(false);
