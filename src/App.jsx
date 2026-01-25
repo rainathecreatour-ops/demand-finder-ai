@@ -6,14 +6,7 @@ function App() {
   const [passwordInput, setPasswordInput] = useState('');
   const [step, setStep] = useState('intake');
   const [loading, setLoading] = useState(false);
-const [nicheData, setNicheData] = useState({
-  niche: '',
-  buyer: '',
-  platform: '',
-  customPlatform: '',
-  productType: ''
-});
-
+setNicheData({ niche: '', buyer: '', platform: '', customPlatform: '', productType: '' });
 
   const [chatHistory, setChatHistory] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
@@ -36,7 +29,7 @@ const [nicheData, setNicheData] = useState({
     }
   };
 
-  const handleStartResearch = async () => {
+const handleStartResearch = async () => {
   if (
     !nicheData.niche ||
     !nicheData.buyer ||
@@ -47,6 +40,20 @@ const [nicheData, setNicheData] = useState({
     alert('Please fill in all fields to begin research');
     return;
   }
+
+  setLoading(true);
+  setStep('research');
+
+  const platformValue =
+    nicheData.platform === 'Other' ? nicheData.customPlatform : nicheData.platform;
+
+  const initialPrompt = `Analyze this niche briefly:
+Niche: ${nicheData.niche}
+Buyer: ${nicheData.buyer}
+Platform: ${platformValue}
+Type: ${nicheData.productType}
+
+Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. Keep it brief.`;
 
   setLoading(true);
   setStep('research');
