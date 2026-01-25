@@ -345,10 +345,7 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
               <TrendingUp className="w-6 h-6 text-white" />
             </div>
             <div>
-            <h1 className="text-2xl font-bold">{productName}</h1>
-
-  🔐 {productName || "Demand Finder AI"}
-</h1>
+           <h1 className="text-2xl font-bold">{productName}</h1>
               
               <p className="text-sm text-gray-600">Find profitable products</p>
             </div>
