@@ -3,7 +3,10 @@ import { Search, TrendingUp, Package, DollarSign, Target, FileText, Loader2, Dow
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [passwordInput, setPasswordInput] = useState('');
+  const [emailInput, setEmailInput] = useState('');
+  const [emailSent, setEmailSent] = useState(false);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
   const [step, setStep] = useState('intake');
   const [loading, setLoading] = useState(false);
   const [nicheData, setNicheData] = useState({
@@ -24,12 +27,68 @@ function App() {
     "Budget management for college students"
   ];
 
-  const handleLogin = () => {
-    if (passwordInput === 'PREMIUM2024') {
-      setIsAuthenticated(true);
-    } else {
-      alert('Invalid access code!');
+  // Check for session token on load
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionToken = urlParams.get('session') || localStorage.getItem('sessionToken');
+    
+    if (sessionToken) {
+      // Verify session
+      fetch('/check-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionToken })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.authenticated) {
+          localStorage.setItem('sessionToken', sessionToken);
+          setUserEmail(data.email);
+          setIsAuthenticated(true);
+          // Clean URL
+          window.history.replaceState({}, '', '/');
+        }
+      })
+      .catch(err => console.error('Session check failed:', err));
     }
+  }, []);
+
+  const handleSendMagicLink = async () => {
+    if (!emailInput || !emailInput.includes('@')) {
+      alert('Please enter a valid email address');
+      return;
+    }
+
+    setAuthLoading(true);
+
+    try {
+      const response = await fetch('/send-magic-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailInput })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setEmailSent(true);
+        alert('Magic link sent! Check your email to sign in.');
+      } else {
+        alert('Error: ' + (data.error || 'Failed to send magic link'));
+      }
+    } catch (error) {
+      alert('Error: ' + error.message);
+    }
+
+    setAuthLoading(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('sessionToken');
+    setIsAuthenticated(false);
+    setUserEmail('');
+    setStep('intake');
+    setChatHistory([]);
   };
 
   const handleStartResearch = async () => {
@@ -198,20 +257,66 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
       <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
           <div className="text-center mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">🔐 Demand Finder AI</h1>
-            <p className="text-gray-600">Enter your access code</p>
+            <div className="inline-block p-3 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full mb-4">
+              <TrendingUp className="w-12 h-12 text-indigo-600" />
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Demand Finder AI</h1>
+            <p className="text-gray-600">
+              {emailSent ? 'Check your email!' : 'Sign in with your email'}
+            </p>
           </div>
-          <input
-            type="password"
-            value={passwordInput}
-            onChange={(e) => setPasswordInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-            placeholder="Access code"
-            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg mb-4 focus:border-indigo-500 focus:outline-none text-lg"
-          />
-          <button onClick={handleLogin} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 text-lg">
-            Access App →
-          </button>
+
+          {!emailSent ? (
+            <>
+              <input
+                type="email"
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMagicLink()}
+                placeholder="your@email.com"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg mb-4 focus:border-indigo-500 focus:outline-none text-lg"
+                disabled={authLoading}
+              />
+              <button 
+                onClick={handleSendMagicLink} 
+                disabled={authLoading}
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 text-lg disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {authLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  '✨ Send Magic Link'
+                )}
+              </button>
+              <p className="text-xs text-gray-500 text-center mt-4">
+                We'll send you a secure link to access the app
+              </p>
+            </>
+          ) : (
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-2">Email Sent!</h3>
+              <p className="text-gray-600 mb-4">
+                Check your inbox for <strong>{emailInput}</strong>
+              </p>
+              <p className="text-sm text-gray-500 mb-4">
+                Click the magic link in the email to sign in. The link expires in 15 minutes.
+              </p>
+              <button 
+                onClick={() => setEmailSent(false)}
+                className="text-indigo-600 hover:text-indigo-700 text-sm font-semibold"
+              >
+                ← Use different email
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -243,6 +348,10 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
             )}
             <button onClick={() => setShowHelp(!showHelp)} className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200">
               <HelpCircle className="w-4 h-4" />Help
+            </button>
+            <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200">
+              <span className="text-sm">{userEmail}</span>
+              <span className="text-xs">Logout</span>
             </button>
           </div>
         </div>
@@ -331,12 +440,26 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">3. Where to sell?</label>
                   <select value={nicheData.platform} onChange={(e) => setNicheData({...nicheData, platform: e.target.value})} className="w-full px-4 py-3 border rounded-lg">
-                    <option value="">Select...</option>
-                    <option value="Etsy">Etsy</option>
-                    <option value="Amazon">Amazon</option>
-                    <option value="Shopify">Shopify</option>
-                    <option value="Gumroad">Gumroad</option>
-                    <option value="Own Website">Own Website</option>
+                    <option value="">Select platform...</option>
+                    <optgroup label="E-commerce">
+                      <option value="Etsy">Etsy</option>
+                      <option value="Amazon">Amazon</option>
+                      <option value="Shopify">Shopify</option>
+                      <option value="Own Website">Own Website</option>
+                    </optgroup>
+                    <optgroup label="Digital Products">
+                      <option value="Gumroad">Gumroad</option>
+                      <option value="Creative Market">Creative Market</option>
+                      <option value="Teachable">Teachable</option>
+                      <option value="Udemy">Udemy</option>
+                      <option value="Patreon">Patreon</option>
+                    </optgroup>
+                    <optgroup label="Freelance Services">
+                      <option value="Fiverr">Fiverr</option>
+                      <option value="Upwork">Upwork</option>
+                      <option value="Freelancer">Freelancer</option>
+                      <option value="99designs">99designs</option>
+                    </optgroup>
                   </select>
                 </div>
 
