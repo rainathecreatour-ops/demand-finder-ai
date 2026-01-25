@@ -37,13 +37,31 @@ const [nicheData, setNicheData] = useState({
   };
 
   const handleStartResearch = async () => {
-    if (
-  !nicheData.niche ||
-  !nicheData.buyer ||
-  !nicheData.platform ||
-  (nicheData.platform === 'Other' && !nicheData.customPlatform) ||
-  !nicheData.productType
-) {
+  if (
+    !nicheData.niche ||
+    !nicheData.buyer ||
+    !nicheData.platform ||
+    (nicheData.platform === 'Other' && !nicheData.customPlatform) ||
+    !nicheData.productType
+  ) {
+    alert('Please fill in all fields to begin research');
+    return;
+  }
+
+  setLoading(true);
+  setStep('research');
+
+  const platformValue =
+    nicheData.platform === 'Other' ? nicheData.customPlatform : nicheData.platform;
+
+  const initialPrompt = `Analyze this niche briefly:
+Niche: ${nicheData.niche}
+Buyer: ${nicheData.buyer}
+Platform: ${platformValue}
+Type: ${nicheData.productType}
+
+Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. Keep it brief.`;
+
 
 
     setLoading(true);
