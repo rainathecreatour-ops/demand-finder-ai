@@ -56,7 +56,6 @@ function App() {
   }, []);
 
 
-// REPLACE your entire handleVerifyLicense function with THIS:
 
 const handleVerifyLicense = async () => {
   if (!licenseKey || !licenseKey.trim()) {
@@ -82,7 +81,6 @@ const handleVerifyLicense = async () => {
     return;
   }
 
-  // If not a valid key, show error
   alert('❌ Invalid license key. Please check your key and try again.');
 };
 
