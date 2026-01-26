@@ -57,44 +57,48 @@ function App() {
 
 const handleVerifyLicense = async () => {
   if (!licenseKey || !licenseKey.trim()) {
-    alert('Please enter your license key');
-    return;
-  }
-
-  // DEV BACKDOOR - Check FIRST before API call
-  if (licenseKey.trim() === 'DEV-ADMIN-2024') {
-    const devToken = 'dev-session-' + Date.now();
-    localStorage.setItem('sessionToken', devToken);
-    setUserEmail('admin@nicheresearcher.com');
-    setIsAuthenticated(true);
-    alert('✅ Dev mode activated! Full access granted.');
+    alert("Please enter your license key");
     return;
   }
 
   setAuthLoading(true);
 
   try {
-    const response = await fetch('/verify-license', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ licenseKey: licenseKey.trim() })
+    const response = await fetch("/verify-license", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ licenseKey: licenseKey.trim() }),
     });
 
-    const data = await response.json();
+    const raw = await response.text(); // <-- important
+    let data = null;
 
-    if (response.ok && data.success) {
-      localStorage.setItem('sessionToken', data.sessionToken);
+    // Try JSON parse only if there's content
+    if (raw) {
+      try {
+        data = JSON.parse(raw);
+      } catch {
+        // Not JSON (likely HTML error page)
+        console.error("Non-JSON response:", raw);
+        throw new Error(`Server returned non-JSON. Status ${response.status}`);
+      }
+    } else {
+      throw new Error(`Empty response body. Status ${response.status}`);
+    }
+
+    if (response.ok && data?.success) {
+      localStorage.setItem("sessionToken", data.sessionToken);
       setUserEmail(data.email);
       setIsAuthenticated(true);
-      alert(data.message || 'License verified! Welcome!');
+      alert(data.message || "License verified! Welcome!");
     } else {
-      alert(data.error || 'Invalid license key');
+      alert(data?.error || "Invalid license key");
     }
   } catch (error) {
-    alert('Error verifying license: ' + error.message);
+    alert("Error verifying license: " + error.message);
+  } finally {
+    setAuthLoading(false);
   }
-
-  setAuthLoading(false);
 };
 
   const handleLogout = () => {
