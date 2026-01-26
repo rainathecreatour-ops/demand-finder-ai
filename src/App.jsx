@@ -40,13 +40,16 @@ const handleVerifyLicense = async () => {
     return;
   }
   
-  // Monthly access codes - CHANGE THIS EVERY MONTH
-  const currentMonthCode = 'JANUARY2026';  // ← Change this monthly!
+  // List of valid personal access codes
+  // Add each customer's code when they purchase
+  const validCodes = [
+    'YOUR-ADMIN-CODE',           // Your personal code
+    // Add customer codes below as they purchase:
+    // 'CUSTOMER-ABC123',
+    // 'CUSTOMER-XYZ789',
+  ];
   
-  // Also keep last month's code active for grace period
-  const lastMonthCode = 'DECEMBER2025';
-  
-  if (code === currentMonthCode || code === lastMonthCode) {
+  if (validCodes.includes(code)) {
     const sessionToken = 'session-' + Date.now();
     localStorage.setItem('sessionToken', sessionToken);
     setUserEmail('user@nicheresearcher.com');
@@ -55,8 +58,9 @@ const handleVerifyLicense = async () => {
     return;
   }
   
-  alert('❌ Invalid access code. Please check your email for this month\'s code or contact support.');
+  alert('❌ Invalid access code. Please check your purchase email or contact support.');
 };
+
 
 const handleStartResearch = async () => {
   if (!nicheData.niche || !nicheData.buyer || !nicheData.platform || !nicheData.productType) {
