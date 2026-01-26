@@ -1,5 +1,3 @@
-// REPLACE your entire handleVerifyLicense function with THIS:
-
 const handleVerifyLicense = async () => {
   if (!licenseKey || !licenseKey.trim()) {
     alert('Please enter your license key');
