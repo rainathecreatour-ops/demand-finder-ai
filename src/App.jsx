@@ -6,12 +6,9 @@ function App() {
   const [licenseKey, setLicenseKey] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [userEmail, setUserEmail] = useState('');
-
-
-
   const [step, setStep] = useState('intake');
   const [loading, setLoading] = useState(false);
- const [nicheData, setNicheData] = useState({
+  const [nicheData, setNicheData] = useState({
   niche: '',
   buyer: '',
   platform: '',
@@ -21,6 +18,15 @@ function App() {
   const [chatHistory, setChatHistory] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [showHelp, setShowHelp] = useState(false);
+
+  const handleLogout = () => {
+  localStorage.removeItem('sessionToken');
+  setIsAuthenticated(false);
+  setUserEmail('');
+  setStep('intake');
+  setChatHistory([]);
+};
+
 
   const nicheExamples = [
     "Productivity tools for remote workers",
@@ -230,7 +236,8 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
             <div className="inline-block p-3 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full mb-4">
               <TrendingUp className="w-12 h-12 text-indigo-600" />
             </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{Niche Researcher Tool}</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Niche Researcher Tool</h1>
+
 
 <div className="text-xs text-red-500 font-bold">BUILD MARKER: ACCESS-CODE-1</div>
 
@@ -301,7 +308,8 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
               <TrendingUp className="w-6 h-6 text-white" />
             </div>
             <div>
-           <h1 className="text-2xl font-bold">{Niche Researcher Tool}</h1>
+          <h1 className="text-2xl font-bold">Niche Researcher Tool</h1>
+
               
               <p className="text-sm text-gray-600">Find profitable products</p>
             </div>
