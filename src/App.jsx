@@ -6,7 +6,7 @@ function App() {
   const [licenseKey, setLicenseKey] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [userEmail, setUserEmail] = useState('');
-const [productName, setProductName] = useState('Niche Researcher Tool ');
+
 
 
   const [step, setStep] = useState('intake');
@@ -31,8 +31,7 @@ const [productName, setProductName] = useState('Niche Researcher Tool ');
   ];
 
   // Check for session token on load
-  React.useEffect(() => {
-    setProductName("Niche Researcher Tool ");
+  React.useEffect(() => 
     const sessionToken = localStorage.getItem('sessionToken');
     
     if (sessionToken) {
@@ -46,7 +45,6 @@ const [productName, setProductName] = useState('Niche Researcher Tool ');
       .then(data => {
         if (data.authenticated) {
           setUserEmail(data.email);
-          setProductName(data.productName || 'Niche Researcher Tool ');
           setIsAuthenticated(true);
         } else {
           // Session invalid, clear it
@@ -78,7 +76,6 @@ const [productName, setProductName] = useState('Niche Researcher Tool ');
         // Store session token
         localStorage.setItem('sessionToken', data.sessionToken);
         setUserEmail(data.email);
-        setProductName(data.productName || 'Niche Researcher Tool ');
         setIsAuthenticated(true);
         alert(data.message || 'License verified! Welcome!');
       } else {
@@ -95,7 +92,6 @@ const [productName, setProductName] = useState('Niche Researcher Tool ');
     localStorage.removeItem('sessionToken');
     setIsAuthenticated(false);
     setUserEmail('');
-    setProductName('');
     setStep('intake');
     setChatHistory([]);
     setLicenseKey('');
@@ -270,7 +266,7 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
             <div className="inline-block p-3 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full mb-4">
               <TrendingUp className="w-12 h-12 text-indigo-600" />
             </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{productName}</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{Niche Researcher Tool}</h1>
 
 
 
@@ -345,7 +341,7 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
               <TrendingUp className="w-6 h-6 text-white" />
             </div>
             <div>
-           <h1 className="text-2xl font-bold">{productName}</h1>
+           <h1 className="text-2xl font-bold">{Niche Researcher Tool}</h1>
               
               <p className="text-sm text-gray-600">Find profitable products</p>
             </div>
