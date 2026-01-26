@@ -56,55 +56,35 @@ function App() {
   }, []);
 
 
-try {
-  const response = await fetch("/verify-license", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ licenseKey: licenseKey.trim() }),
-  });
+// REPLACE your entire handleVerifyLicense function with THIS:
 
-  const raw = await response.text(); // read as text first
-
-  console.log("VERIFY STATUS:", response.status);
-  console.log("VERIFY RAW BODY:", raw);
-
-  // If the server returned HTML or empty body, this will catch it cleanly:
-  if (!raw) {
-    throw new Error(`Empty response body (HTTP ${response.status}).`);
+const handleVerifyLicense = async () => {
+  if (!licenseKey || !licenseKey.trim()) {
+    alert('Please enter your license key');
+    return;
   }
 
-  let data;
-  try {
-    data = JSON.parse(raw);
-  } catch {
-    throw new Error(
-      `Non-JSON response (HTTP ${response.status}). Check Network tab.`
-    );
-  }
+  const key = licenseKey.trim();
 
-  if (response.ok && data.success) {
-    localStorage.setItem("sessionToken", data.sessionToken);
-    setUserEmail(data.email);
+  // Simple license check - no API calls
+  // Valid keys: DEV-ADMIN-2024 or any Gumroad key you manually approve
+  const validKeys = [
+    'DEV-ADMIN-2024',
+    // Add more keys here as needed
+  ];
+
+  if (validKeys.includes(key)) {
+    const sessionToken = 'session-' + Date.now();
+    localStorage.setItem('sessionToken', sessionToken);
+    setUserEmail('user@nicheresearcher.com');
     setIsAuthenticated(true);
-    alert(data.message || "License verified! Welcome!");
-  } else {
-    alert(data.error || "Invalid license key");
+    alert('✅ License activated! Welcome to Niche Researcher Tool!');
+    return;
   }
-} catch (error) {
-  alert("Error verifying license: " + error.message);
-} finally {
-  setAuthLoading(false);
-}
 
-
-  const handleStartResearch = async () => {
-    if (!nicheData.niche || !nicheData.buyer || !nicheData.platform || !nicheData.productType) {
-      alert('Please fill in all fields to begin research');
-      return;
-    }
-
-    setLoading(true);
-    setStep('research');
+  // If not a valid key, show error
+  alert('❌ Invalid license key. Please check your key and try again.');
+};
     
     const initialPrompt = `Analyze this niche briefly:
 Niche: ${nicheData.niche}
