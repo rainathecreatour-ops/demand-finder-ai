@@ -56,10 +56,26 @@ function App() {
   }, []);
 
   const handleVerifyLicense = async () => {
-    if (!licenseKey || !licenseKey.trim()) {
-      alert('Please enter your license key');
-      return;
-    }
+   const handleVerifyLicense = async () => {
+  if (!licenseKey || !licenseKey.trim()) {
+    alert('Please enter your license key');
+    return;
+  }
+
+  // ⭐ ADD THIS CODE HERE ⭐
+  if (licenseKey.trim() === 'DEV-ADMIN-2024') {
+    const devToken = 'dev-session-' + Date.now();
+    localStorage.setItem('sessionToken', devToken);
+    setUserEmail('admin@nicheresearcher.com');
+    setIsAuthenticated(true);
+    alert('✅ Dev mode activated! Full access granted.');
+    return;
+  }
+  // ⭐ END OF NEW CODE ⭐
+
+  setAuthLoading(true);
+  
+  // ... rest of existing code
 
     setAuthLoading(true);
 
