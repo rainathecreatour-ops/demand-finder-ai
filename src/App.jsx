@@ -85,8 +85,17 @@ const handleVerifyLicense = async () => {
   // If not a valid key, show error
   alert('❌ Invalid license key. Please check your key and try again.');
 };
-    
-    const initialPrompt = `Analyze this niche briefly:
+
+const handleStartResearch = async () => {
+  if (!nicheData.niche || !nicheData.buyer || !nicheData.platform || !nicheData.productType) {
+    alert('Please fill in all fields to begin research');
+    return;
+  }
+
+  setLoading(true);
+  setStep('research');
+  
+  const initialPrompt = `Analyze this niche briefly:
 Niche: ${nicheData.niche}
 Buyer: ${nicheData.buyer}
 Platform: ${nicheData.platform}
@@ -94,7 +103,7 @@ Type: ${nicheData.productType}
 
 Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. Keep it brief.`;
 
-    try {
+  try {
       const response = await fetch('/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
