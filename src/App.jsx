@@ -233,9 +233,6 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{Niche Researcher Tool}</h1>
 
 
-
-
-
         <p className="text-gray-600">Enter your access code to get started</p>
           </div>
           <div className="space-y-4">
