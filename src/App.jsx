@@ -55,7 +55,7 @@ function App() {
     }
   }, []);
 
- const handleVerifyLicense = async () => {
+const handleVerifyLicense = async () => {
   if (!licenseKey || !licenseKey.trim()) {
     alert('Please enter your license key');
     return;
@@ -96,38 +96,6 @@ function App() {
 
   setAuthLoading(false);
 };
-  // ⭐ END OF NEW CODE ⭐
-
-  setAuthLoading(true);
-  
-  // ... rest of existing code
-
-    setAuthLoading(true);
-
-    try {
-      const response = await fetch('/verify-license', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ licenseKey: licenseKey.trim() })
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        // Store session token
-        localStorage.setItem('sessionToken', data.sessionToken);
-        setUserEmail(data.email);
-        setIsAuthenticated(true);
-        alert(data.message || 'License verified! Welcome!');
-      } else {
-        alert(data.error || 'Invalid license key');
-      }
-    } catch (error) {
-      alert('Error verifying license: ' + error.message);
-    }
-
-    setAuthLoading(false);
-  };
 
   const handleLogout = () => {
     localStorage.removeItem('sessionToken');
