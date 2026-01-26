@@ -30,31 +30,6 @@ function App() {
     "Budget management for college students"
   ];
 
-  // Check for session token on load
-  React.useEffect(() => 
-    const sessionToken = localStorage.getItem('sessionToken');
-    
-    if (sessionToken) {
-      // Verify session
-      fetch('/check-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionToken })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.authenticated) {
-          setUserEmail(data.email);
-          setIsAuthenticated(true);
-        } else {
-          // Session invalid, clear it
-          localStorage.removeItem('sessionToken');
-        }
-      })
-      .catch(err => console.error('Session check failed:', err));
-    }
-  }, []);
-
 
 
 const handleVerifyLicense = async () => {
