@@ -55,60 +55,47 @@ function App() {
     }
   }, []);
 
-const handleVerifyLicense = async () => {
-  if (!licenseKey || !licenseKey.trim()) {
-    alert("Please enter your license key");
-    return;
+
+try {
+  const response = await fetch("/verify-license", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ licenseKey: licenseKey.trim() }),
+  });
+
+  const raw = await response.text(); // read as text first
+
+  console.log("VERIFY STATUS:", response.status);
+  console.log("VERIFY RAW BODY:", raw);
+
+  // If the server returned HTML or empty body, this will catch it cleanly:
+  if (!raw) {
+    throw new Error(`Empty response body (HTTP ${response.status}).`);
   }
 
-  setAuthLoading(true);
-
+  let data;
   try {
-    const response = await fetch("/verify-license", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ licenseKey: licenseKey.trim() }),
-    });
-
-    const raw = await response.text(); // <-- important
-    let data = null;
-
-    // Try JSON parse only if there's content
-    if (raw) {
-      try {
-        data = JSON.parse(raw);
-      } catch {
-        // Not JSON (likely HTML error page)
-        console.error("Non-JSON response:", raw);
-        throw new Error(`Server returned non-JSON. Status ${response.status}`);
-      }
-    } else {
-      throw new Error(`Empty response body. Status ${response.status}`);
-    }
-
-    if (response.ok && data?.success) {
-      localStorage.setItem("sessionToken", data.sessionToken);
-      setUserEmail(data.email);
-      setIsAuthenticated(true);
-      alert(data.message || "License verified! Welcome!");
-    } else {
-      alert(data?.error || "Invalid license key");
-    }
-  } catch (error) {
-    alert("Error verifying license: " + error.message);
-  } finally {
-    setAuthLoading(false);
+    data = JSON.parse(raw);
+  } catch {
+    throw new Error(
+      `Non-JSON response (HTTP ${response.status}). Check Network tab.`
+    );
   }
-};
 
-  const handleLogout = () => {
-    localStorage.removeItem('sessionToken');
-    setIsAuthenticated(false);
-    setUserEmail('');
-    setStep('intake');
-    setChatHistory([]);
-    setLicenseKey('');
-  };
+  if (response.ok && data.success) {
+    localStorage.setItem("sessionToken", data.sessionToken);
+    setUserEmail(data.email);
+    setIsAuthenticated(true);
+    alert(data.message || "License verified! Welcome!");
+  } else {
+    alert(data.error || "Invalid license key");
+  }
+} catch (error) {
+  alert("Error verifying license: " + error.message);
+} finally {
+  setAuthLoading(false);
+}
+
 
   const handleStartResearch = async () => {
     if (!nicheData.niche || !nicheData.buyer || !nicheData.platform || !nicheData.productType) {
