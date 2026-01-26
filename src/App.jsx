@@ -232,6 +232,7 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
             </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{Niche Researcher Tool}</h1>
 
+<div className="text-xs text-red-500 font-bold">BUILD MARKER: ACCESS-CODE-1</div>
 
         <p className="text-gray-600">Enter your access code to get started</p>
           </div>
