@@ -6,7 +6,7 @@ function App() {
   const [licenseKey, setLicenseKey] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [userEmail, setUserEmail] = useState('');
-const [productName, setProductName] = useState('Demand Finder AI');
+const [productName, setProductName] = useState('Niche Researcher Tool ');
 
 
   const [step, setStep] = useState('intake');
@@ -32,7 +32,7 @@ const [productName, setProductName] = useState('Demand Finder AI');
 
   // Check for session token on load
   React.useEffect(() => {
-    setProductName("Demand Finder AI");
+    setProductName("Niche Researcher Tool ");
     const sessionToken = localStorage.getItem('sessionToken');
     
     if (sessionToken) {
@@ -46,7 +46,7 @@ const [productName, setProductName] = useState('Demand Finder AI');
       .then(data => {
         if (data.authenticated) {
           setUserEmail(data.email);
-          setProductName(data.productName || 'Demand Finder AI');
+          setProductName(data.productName || 'Niche Researcher Tool ');
           setIsAuthenticated(true);
         } else {
           // Session invalid, clear it
@@ -78,7 +78,7 @@ const [productName, setProductName] = useState('Demand Finder AI');
         // Store session token
         localStorage.setItem('sessionToken', data.sessionToken);
         setUserEmail(data.email);
-        setProductName(data.productName || 'Demand Finder AI');
+        setProductName(data.productName || 'Niche Researcher Tool ');
         setIsAuthenticated(true);
         alert(data.message || 'License verified! Welcome!');
       } else {
