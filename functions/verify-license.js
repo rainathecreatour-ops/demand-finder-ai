@@ -1,38 +1,29 @@
-export async function onRequestPost({ request }) {
-  try {
-    const { licenseKey } = await request.json();
+// REPLACE your entire handleVerifyLicense function with THIS:
 
-    if (!licenseKey || !licenseKey.trim()) {
-      return new Response(JSON.stringify({ success: false, error: "Missing licenseKey" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    // TODO: Replace with real license verification
-    const ok = licenseKey.trim().startsWith("NR-");
-
-    if (!ok) {
-      return new Response(JSON.stringify({ success: false, error: "Invalid license key" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    return new Response(JSON.stringify({
-      success: true,
-      sessionToken: "sess_" + crypto.randomUUID(),
-      email: "customer@example.com",
-      message: "License verified!",
-    }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-
-  } catch (err) {
-    return new Response(JSON.stringify({ success: false, error: "Server error: " + err.message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+const handleVerifyLicense = async () => {
+  if (!licenseKey || !licenseKey.trim()) {
+    alert('Please enter your license key');
+    return;
   }
-}
+
+  const key = licenseKey.trim();
+
+  // Simple license check - no API calls
+  // Valid keys: DEV-ADMIN-2024 or any Gumroad key you manually approve
+  const validKeys = [
+    'DEV-ADMIN-2024',
+    // Add more keys here as needed
+  ];
+
+  if (validKeys.includes(key)) {
+    const sessionToken = 'session-' + Date.now();
+    localStorage.setItem('sessionToken', sessionToken);
+    setUserEmail('user@nicheresearcher.com');
+    setIsAuthenticated(true);
+    alert('✅ License activated! Welcome to Niche Researcher Tool!');
+    return;
+  }
+
+  // If not a valid key, show error
+  alert('❌ Invalid license key. Please check your key and try again.');
+};
