@@ -236,16 +236,15 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
 
 
 
-            <p className="text-gray-600">Enter your license key to get started</p>
+        <p className="text-gray-600">Enter your access code to get started</p>
           </div>
-
           <div className="space-y-4">
             <input
               type="text"
               value={licenseKey}
               onChange={(e) => setLicenseKey(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleVerifyLicense()}
-              placeholder="XXXX-XXXX-XXXX-XXXX"
+              placeholder="CUSTOMER-ABC123"
               className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg mb-2 focus:border-indigo-500 focus:outline-none text-lg font-mono text-center uppercase"
               disabled={authLoading}
               maxLength={50}
@@ -262,27 +261,25 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
                   Verifying...
                 </>
               ) : (
-                '🔓 Activate License'
+                '🔓 Activate Access'
               )}
             </button>
-
             <div className="border-t pt-4">
               <p className="text-sm text-gray-600 mb-3">
-                💡 <strong>Where's my license key?</strong>
+                💡 <strong>Where's my access code?</strong>
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
-                <li>• Check your Gumroad purchase email</li>
-                <li>• Or login to Gumroad Library</li>
-                <li>• Your license key was sent after purchase</li>
+                <li>• Check your purchase confirmation email</li>
+                <li>• Your personal access code was sent after purchase</li>
+                <li>• Can't find it? Contact support</li>
               </ul>
             </div>
-
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <p className="text-sm text-blue-800 font-semibold mb-2">
-                🛒 Don't have a license yet?
+                🛒 Don't have access yet?
               </p>
               <a 
-                href="https://yourproduct.gumroad.com" 
+                href="https://creatour2.gumroad.com/l/jzmabn" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 font-semibold"
@@ -295,6 +292,7 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
       </div>
     );
   }
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
