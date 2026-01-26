@@ -55,7 +55,7 @@ function App() {
     }
   }, []);
 
-  const handleVerifyLicense = async () => {
+ const handleVerifyLicense = async () => {
   if (!licenseKey || !licenseKey.trim()) {
     alert('Please enter your license key');
     return;
@@ -73,15 +73,29 @@ function App() {
 
   setAuthLoading(true);
 
-  // ⭐ ADD THIS CODE HERE ⭐
-  if (licenseKey.trim() === 'DEV-ADMIN-2024') {
-    const devToken = 'dev-session-' + Date.now();
-    localStorage.setItem('sessionToken', devToken);
-    setUserEmail('admin@nicheresearcher.com');
-    setIsAuthenticated(true);
-    alert('✅ Dev mode activated! Full access granted.');
-    return;
+  try {
+    const response = await fetch('/verify-license', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ licenseKey: licenseKey.trim() })
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.success) {
+      localStorage.setItem('sessionToken', data.sessionToken);
+      setUserEmail(data.email);
+      setIsAuthenticated(true);
+      alert(data.message || 'License verified! Welcome!');
+    } else {
+      alert(data.error || 'Invalid license key');
+    }
+  } catch (error) {
+    alert('Error verifying license: ' + error.message);
   }
+
+  setAuthLoading(false);
+};
   // ⭐ END OF NEW CODE ⭐
 
   setAuthLoading(true);
