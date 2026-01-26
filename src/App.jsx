@@ -40,8 +40,7 @@ const handleVerifyLicense = async () => {
     return;
   }
   
-  // List of valid personal access codes
-  // Add each customer's code when they purchase
+  
   const validCodes = [
     'YOUR-ADMIN-CODE',           // Your personal code
     // Add customer codes below as they purchase:
