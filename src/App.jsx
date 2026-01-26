@@ -33,30 +33,29 @@ function App() {
 
 
 const handleVerifyLicense = async () => {
-  if (!licenseKey || !licenseKey.trim()) {
-    alert('Please enter your license key');
+  const code = licenseKey.trim().toUpperCase();
+  
+  if (!code) {
+    alert('Please enter your access code');
     return;
   }
-
-  const key = licenseKey.trim();
-
-  // Simple license check - no API calls
-  // Valid keys: DEV-ADMIN-2024 or any Gumroad key you manually approve
-  const validKeys = [
-    'DEV-ADMIN-2024',
-    // Add more keys here as needed
-  ];
-
-  if (validKeys.includes(key)) {
+  
+  // Monthly access codes - CHANGE THIS EVERY MONTH
+  const currentMonthCode = 'JANUARY2026';  // ← Change this monthly!
+  
+  // Also keep last month's code active for grace period
+  const lastMonthCode = 'DECEMBER2025';
+  
+  if (code === currentMonthCode || code === lastMonthCode) {
     const sessionToken = 'session-' + Date.now();
     localStorage.setItem('sessionToken', sessionToken);
     setUserEmail('user@nicheresearcher.com');
     setIsAuthenticated(true);
-    alert('✅ License activated! Welcome to Niche Researcher Tool!');
+    alert('✅ Access granted! Welcome to Niche Researcher Tool!');
     return;
   }
-
-  alert('❌ Invalid license key. Please check your key and try again.');
+  
+  alert('❌ Invalid access code. Please check your email for this month\'s code or contact support.');
 };
 
 const handleStartResearch = async () => {
