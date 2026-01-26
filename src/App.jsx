@@ -30,8 +30,6 @@ function App() {
     "Budget management for college students"
   ];
 
-
-
 const handleVerifyLicense = async () => {
   const code = licenseKey.trim().toUpperCase();
   
@@ -40,7 +38,8 @@ const handleVerifyLicense = async () => {
     return;
   }
   
-  
+  // List of valid personal access codes
+  // Add each customer's code when they purchase
   const validCodes = [
     'YOUR-ADMIN-CODE',           // Your personal code
     // Add customer codes below as they purchase:
@@ -59,6 +58,8 @@ const handleVerifyLicense = async () => {
   
   alert('❌ Invalid access code. Please check your purchase email or contact support.');
 };
+
+
 
 
 const handleStartResearch = async () => {
