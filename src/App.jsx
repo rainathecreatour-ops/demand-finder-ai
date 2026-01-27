@@ -81,11 +81,10 @@ function App() {
 
     try {
       const validCodes = [
-        'YOUR-ADMIN-CODE'
-        // Add customer codes below as they purchase:
-        // 'CUSTOMER-ABC123',
-        // 'CUSTOMER-XYZ789',
+        'YOUR-ADMIN-CODE',
+        'TEST-123456'
       ];
+      // Add customer codes above as they purchase
 
       if (validCodes.includes(code)) {
         const sessionToken = 'session-' + Date.now();
