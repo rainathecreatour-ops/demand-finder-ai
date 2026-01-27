@@ -81,7 +81,8 @@ function App() {
 
     try {
       const validCodes = [
-        'YOUR-ADMIN-CODE'
+        'YOUR-ADMIN-CODE',
+        'TEST-123456',
         // Add customer codes below as they purchase:
         // 'CUSTOMER-ABC123',
         // 'CUSTOMER-XYZ789',
