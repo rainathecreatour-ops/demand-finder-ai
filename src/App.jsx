@@ -43,7 +43,7 @@ function App() {
     'Budget management for college students'
   ];
 
-  // Persist login across refresh
+  
   useEffect(() => {
     const token = localStorage.getItem('sessionToken');
     const savedEmail = localStorage.getItem('userEmail');
