@@ -3,12 +3,7 @@ import { Search, TrendingUp, Package, DollarSign, Target, FileText, Loader2, Dow
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [licenseKey, setLicenseKey] = useState('');
-  const [authLoading, setAuthLoading] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
-const [productName, setProductName] = useState('Demand Finder AI');
-
-
+  const [passwordInput, setPasswordInput] = useState('');
   const [step, setStep] = useState('intake');
   const [loading, setLoading] = useState(false);
  const [nicheData, setNicheData] = useState({
@@ -18,9 +13,11 @@ const [productName, setProductName] = useState('Demand Finder AI');
   customPlatform: '',
   productType: ''
 });
+
   const [chatHistory, setChatHistory] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [showHelp, setShowHelp] = useState(false);
+  
 
   const nicheExamples = [
     "Productivity tools for remote workers",
@@ -30,75 +27,12 @@ const [productName, setProductName] = useState('Demand Finder AI');
     "Budget management for college students"
   ];
 
-  // Check for session token on load
-  React.useEffect(() => {
-    setProductName("Demand Finder AI");
-    const sessionToken = localStorage.getItem('sessionToken');
-    
-    if (sessionToken) {
-      // Verify session
-      fetch('/check-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionToken })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.authenticated) {
-          setUserEmail(data.email);
-          setProductName(data.productName || 'Demand Finder AI');
-          setIsAuthenticated(true);
-        } else {
-          // Session invalid, clear it
-          localStorage.removeItem('sessionToken');
-        }
-      })
-      .catch(err => console.error('Session check failed:', err));
+  const handleLogin = () => {
+    if (passwordInput === 'PREMIUM2024') {
+      setIsAuthenticated(true);
+    } else {
+      alert('Invalid access code!');
     }
-  }, []);
-
-  const handleVerifyLicense = async () => {
-    if (!licenseKey || !licenseKey.trim()) {
-      alert('Please enter your license key');
-      return;
-    }
-
-    setAuthLoading(true);
-
-    try {
-      const response = await fetch('/verify-license', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ licenseKey: licenseKey.trim() })
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        // Store session token
-        localStorage.setItem('sessionToken', data.sessionToken);
-        setUserEmail(data.email);
-        setProductName(data.productName || 'Demand Finder AI');
-        setIsAuthenticated(true);
-        alert(data.message || 'License verified! Welcome!');
-      } else {
-        alert(data.error || 'Invalid license key');
-      }
-    } catch (error) {
-      alert('Error verifying license: ' + error.message);
-    }
-
-    setAuthLoading(false);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('sessionToken');
-    setIsAuthenticated(false);
-    setUserEmail('');
-    setProductName('');
-    setStep('intake');
-    setChatHistory([]);
-    setLicenseKey('');
   };
 
   const handleStartResearch = async () => {
@@ -119,27 +53,41 @@ Type: ${nicheData.productType}
 Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. Keep it brief.`;
 
     try {
-      const response = await fetch('/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: initialPrompt }),
-      });
+   const response = await fetch('/analyze', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    prompt: initialPrompt,
+  }),
+});
 
-      const responseText = await response.text();
 
-      if (!response.ok) {
-        console.error('HTTP error! status:', response.status, 'body:', responseText);
-        throw new Error(`HTTP error! status: ${response.status}\n\n${responseText}`);
-      }
+      // Get response as text first
+     // Get response as text first
+const responseText = await response.text();
 
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error('Failed to parse JSON. Response was:', responseText);
-        throw new Error('Server returned invalid response (not JSON).');
-      }
+if (!response.ok) {
+  console.error('HTTP error! status:', response.status, 'body:', responseText);
+  throw new Error(`HTTP error! status: ${response.status}\n\n${responseText}`);
+}
 
+// Parse JSON safely (Cloudflare Function should return JSON)
+let data;
+try {
+  data = JSON.parse(responseText);
+} catch (parseError) {
+  console.error('Failed to parse JSON. Response was:', responseText);
+  throw new Error(
+    'Server returned invalid response (not JSON). Please check that your Cloudflare Pages Function (/functions/analyze.js) is deployed and that ANTHROPIC_API_KEY is set.'
+  );
+}
+
+console.log('API Response:', data);
+
+      
+      console.log('API Response:', data);
+
+      // Check for errors including timeout errors
       if (data.error || data.errorType) {
         const errorMsg = data.errorMessage || JSON.stringify(data.error) || 'Unknown error';
         alert('API Error: ' + errorMsg);
@@ -148,8 +96,17 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
         return;
       }
 
-      if (!data.content || !Array.isArray(data.content)) {
+      if (!data.content) {
+        alert('No content in response. Please try again.');
+        console.error('Full response:', data);
+        setLoading(false);
+        setStep('intake');
+        return;
+      }
+
+      if (!Array.isArray(data.content)) {
         alert('Invalid response format. Please try again.');
+        console.error('Content is not an array:', data.content);
         setLoading(false);
         setStep('intake');
         return;
@@ -175,7 +132,7 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
       setLoading(false);
     } catch (error) {
       console.error('Full error:', error);
-      alert('Error connecting to AI: ' + error.message);
+      alert('Error connecting to AI: ' + error.message + '\n\nPlease check your API key and try again.');
       setLoading(false);
       setStep('intake');
     }
@@ -191,14 +148,20 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
     setLoading(true);
 
     try {
+      // Only send last 10 messages to avoid timeout
       const messagesToSend = newHistory.slice(-10);
       
-      const response = await fetch('/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: messagesToSend }),
-      });
+     const response = await fetch('/analyze', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    // send full conversation so Claude can continue context
+    messages: messagesToSend,
+  }),
+});
 
+
+      // Get response as text first
       const responseText = await response.text();
       
       if (!response.ok) {
@@ -206,13 +169,21 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error('Failed to parse JSON. Response was:', responseText);
-        throw new Error('Server returned invalid response (not JSON).');
-      }
+// Parse JSON safely
+let data;
+try {
+  data = JSON.parse(responseText);
+} catch (parseError) {
+  console.error('Failed to parse JSON. Response was:', responseText);
+  throw new Error(
+    'Server returned invalid response (not JSON). Please check that your Cloudflare Pages Function (/functions/analyze.js) is deployed and that ANTHROPIC_API_KEY is set.'
+  );
+}
+
+console.log('Send Message API Response:', data);
+
+
+      console.log('Send Message API Response:', data);
 
       if (data.error || data.errorType) {
         alert('API Error: ' + (data.errorMessage || JSON.stringify(data.error)));
@@ -220,8 +191,14 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
         return;
       }
 
-      if (!data.content || !Array.isArray(data.content)) {
-        alert('Invalid response: ' + JSON.stringify(data));
+      if (!data.content) {
+        alert('No content in response: ' + JSON.stringify(data));
+        setLoading(false);
+        return;
+      }
+
+      if (!Array.isArray(data.content)) {
+        alert('Content is not an array: ' + JSON.stringify(data.content));
         setLoading(false);
         return;
       }
@@ -267,70 +244,20 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
       <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
           <div className="text-center mb-6">
-            <div className="inline-block p-3 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full mb-4">
-              <TrendingUp className="w-12 h-12 text-indigo-600" />
-            </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{productName}</h1>
-
-
-
-
-
-            <p className="text-gray-600">Enter your license key to get started</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">🔐 Demand Finder AI</h1>
+            <p className="text-gray-600">Enter your access code</p>
           </div>
-
-          <div className="space-y-4">
-            <input
-              type="text"
-              value={licenseKey}
-              onChange={(e) => setLicenseKey(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleVerifyLicense()}
-              placeholder="XXXX-XXXX-XXXX-XXXX"
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg mb-2 focus:border-indigo-500 focus:outline-none text-lg font-mono text-center uppercase"
-              disabled={authLoading}
-              maxLength={50}
-            />
-            
-            <button 
-              onClick={handleVerifyLicense} 
-              disabled={authLoading}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 text-lg disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {authLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Verifying...
-                </>
-              ) : (
-                '🔓 Activate License'
-              )}
-            </button>
-
-            <div className="border-t pt-4">
-              <p className="text-sm text-gray-600 mb-3">
-                💡 <strong>Where's my license key?</strong>
-              </p>
-              <ul className="text-xs text-gray-500 space-y-1">
-                <li>• Check your Gumroad purchase email</li>
-                <li>• Or login to Gumroad Library</li>
-                <li>• Your license key was sent after purchase</li>
-              </ul>
-            </div>
-
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-800 font-semibold mb-2">
-                🛒 Don't have a license yet?
-              </p>
-              <a 
-                href="https://yourproduct.gumroad.com" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 font-semibold"
-              >
-                Purchase on Gumroad →
-              </a>
-            </div>
-          </div>
+          <input
+            type="password"
+            value={passwordInput}
+            onChange={(e) => setPasswordInput(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+            placeholder="Access code"
+            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg mb-4 focus:border-indigo-500 focus:outline-none text-lg"
+          />
+          <button onClick={handleLogin} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 text-lg">
+            Access App →
+          </button>
         </div>
       </div>
     );
@@ -345,8 +272,7 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
               <TrendingUp className="w-6 h-6 text-white" />
             </div>
             <div>
-           <h1 className="text-2xl font-bold">{productName}</h1>
-              
+              <h1 className="text-2xl font-bold">Demand Finder AI</h1>
               <p className="text-sm text-gray-600">Find profitable products</p>
             </div>
           </div>
@@ -363,10 +289,6 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
             )}
             <button onClick={() => setShowHelp(!showHelp)} className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200">
               <HelpCircle className="w-4 h-4" />Help
-            </button>
-            <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200">
-              <span className="text-sm">{userEmail}</span>
-              <span className="text-xs">Logout</span>
             </button>
           </div>
         </div>
@@ -455,26 +377,12 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">3. Where to sell?</label>
                   <select value={nicheData.platform} onChange={(e) => setNicheData({...nicheData, platform: e.target.value})} className="w-full px-4 py-3 border rounded-lg">
-                    <option value="">Select platform...</option>
-                    <optgroup label="E-commerce">
-                      <option value="Etsy">Etsy</option>
-                      <option value="Amazon">Amazon</option>
-                      <option value="Shopify">Shopify</option>
-                      <option value="Own Website">Own Website</option>
-                    </optgroup>
-                    <optgroup label="Digital Products">
-                      <option value="Gumroad">Gumroad</option>
-                      <option value="Creative Market">Creative Market</option>
-                      <option value="Teachable">Teachable</option>
-                      <option value="Udemy">Udemy</option>
-                      <option value="Patreon">Patreon</option>
-                    </optgroup>
-                    <optgroup label="Freelance Services">
-                      <option value="Fiverr">Fiverr</option>
-                      <option value="Upwork">Upwork</option>
-                      <option value="Freelancer">Freelancer</option>
-                      <option value="99designs">99designs</option>
-                    </optgroup>
+                    <option value="">Select...</option>
+                    <option value="Etsy">Etsy</option>
+                    <option value="Amazon">Amazon</option>
+                    <option value="Shopify">Shopify</option>
+                    <option value="Gumroad">Gumroad</option>
+                    <option value="Own Website">Own Website</option>
                   </select>
                 </div>
 
