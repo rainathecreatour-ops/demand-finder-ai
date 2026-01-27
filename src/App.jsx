@@ -6,7 +6,7 @@ function App() {
   const [licenseKey, setLicenseKey] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [userEmail, setUserEmail] = useState('');
-const [productName, setProductName] = useState('Niche Researcher Tool ');
+const [productName, setProductName] = useState('Niche Research Tool');
 
 
   const [step, setStep] = useState('intake');
@@ -32,7 +32,7 @@ const [productName, setProductName] = useState('Niche Researcher Tool ');
 
   // Check for session token on load
   React.useEffect(() => {
-    setProductName("Niche Researcher Tool ");
+    setProductName("Niche Research Tool");
     const sessionToken = localStorage.getItem('sessionToken');
     
     if (sessionToken) {
@@ -46,7 +46,7 @@ const [productName, setProductName] = useState('Niche Researcher Tool ');
       .then(data => {
         if (data.authenticated) {
           setUserEmail(data.email);
-          setProductName(data.productName || 'Niche Researcher Tool ');
+          setProductName(data.productName || 'Niche Research Tool');
           setIsAuthenticated(true);
         } else {
           // Session invalid, clear it
@@ -59,7 +59,7 @@ const [productName, setProductName] = useState('Niche Researcher Tool ');
 
   const handleVerifyLicense = async () => {
     if (!licenseKey || !licenseKey.trim()) {
-      alert('Please enter your license key');
+      alert('Please enter your Access Code');
       return;
     }
 
@@ -78,11 +78,11 @@ const [productName, setProductName] = useState('Niche Researcher Tool ');
         // Store session token
         localStorage.setItem('sessionToken', data.sessionToken);
         setUserEmail(data.email);
-        setProductName(data.productName || 'Niche Researcher Tool ');
+        setProductName(data.productName || 'Niche Research Tool');
         setIsAuthenticated(true);
         alert(data.message || 'License verified! Welcome!');
       } else {
-        alert(data.error || 'Invalid license key');
+        alert(data.error || 'Invalid Access Code');
       }
     } catch (error) {
       alert('Error verifying license: ' + error.message);
@@ -276,20 +276,20 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
 
 
 
-            <p className="text-gray-600">Enter your license key to get started</p>
+            <p className="text-gray-600">Enter your Access Code to get started</p>
           </div>
 
-          <div className="space-y-4">
-            <input
-              type="text"
-              value={licenseKey}
-              onChange={(e) => setLicenseKey(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleVerifyLicense()}
-              placeholder="XXXX-XXXX-XXXX-XXXX"
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg mb-2 focus:border-indigo-500 focus:outline-none text-lg font-mono text-center uppercase"
-              disabled={authLoading}
-              maxLength={50}
-            />
+         <div className="space-y-4">
+  <input
+    type="text"
+    value={licenseKey}
+    onChange={(e) => setLicenseKey(e.target.value)}
+    onKeyPress={(e) => e.key === 'Enter' && handleVerifyLicense()}
+    placeholder="CUSTOMER-ABC123"
+    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg mb-2 focus:border-indigo-500 focus:outline-none text-lg font-mono text-center uppercase"
+    disabled={authLoading}
+    maxLength={50}
+  />
             
             <button 
               onClick={handleVerifyLicense} 
@@ -302,18 +302,18 @@ Give me: A) 3 sub-niches B) Top 3 problems C) 3 product ideas D) Marketing tip. 
                   Verifying...
                 </>
               ) : (
-                '🔓 Activate License'
+                '🔓 Access Code'
               )}
             </button>
 
             <div className="border-t pt-4">
               <p className="text-sm text-gray-600 mb-3">
-                💡 <strong>Where's my license key?</strong>
+                💡 <strong>Where's my Access Code?</strong>
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>• Check your Gumroad purchase email</li>
                 <li>• Or login to Gumroad Library</li>
-                <li>• Your license key was sent after purchase</li>
+                <li>• Your Access Code was sent after purchase</li>
               </ul>
             </div>
 
