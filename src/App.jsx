@@ -43,7 +43,7 @@ function App() {
     'Budget management for college students'
   ];
 
-  
+
   useEffect(() => {
     const token = localStorage.getItem('sessionToken');
     const savedEmail = localStorage.getItem('userEmail');
@@ -84,7 +84,7 @@ function App() {
         'YOUR-ADMIN-CODE',
         'TEST-123456'
       ];
-      
+    
 
       if (validCodes.includes(code)) {
         const sessionToken = 'session-' + Date.now();
